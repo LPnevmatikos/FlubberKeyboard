@@ -1,11 +1,11 @@
 # Manual acceptance — Mac, Simulator, and physical iPhone
 
-All boxes start unchecked. Record device/model, iOS version, Xcode version, tester, and date with results. A simulator run does not satisfy the physical iPhone requirement.
+Cloud build checks performed so far are marked below; device checks remain unchecked. Record device/model, iOS version, Xcode version, tester, and date with results. A simulator run does not satisfy the physical iPhone requirement.
 
 ## Build and installation
 
-- [ ] Run `swift test` on the Mac and generate with XcodeGen.
-- [ ] Build both native targets for an iOS Simulator; inspect the built app's `PlugIns/FlubberKeyboardExtension.appex` and its bundled `words.txt`.
+- [x] Run `swift test` on a Mac and generate with XcodeGen — passed on the [cloud Mac](https://github.com/LPnevmatikos/FlubberKeyboard/actions/runs/40743841766).
+- [x] Build both native targets for an iOS Simulator; inspect embedding/resources — Simulator compilation and device-archive inspection passed on the cloud Mac. Actual extension activation remains unchecked below.
 - [ ] Confirm extension principal class resolves, `com.apple.keyboard-service` is the extension point, `RequestsOpenAccess` and `IsASCIICapable` are false, and extension-safe API checks are enabled.
 - [ ] Configure both targets' signing with your developer account; install containing app on a physical iPhone.
 - [ ] Launch containing app; try word preview and editable demo draft; read setup and limitations. Confirm there is no enabled-status claim.

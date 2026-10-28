@@ -31,6 +31,6 @@ Use the Xcode instructions in `README.md`, select your Personal Team for both ta
 
 ## Build artifacts and scope
 
-The cloud workflow runs Swift tests, XcodeGen, Simulator compilation, an unsigned device archive, actual archive inspection, and unsigned IPA packaging. A Simulator companion-app smoke step captures light/dark screenshots. Read the specific run's results; a new workflow step is not a passed check until that run succeeds.
+The cloud workflow runs Swift tests, XcodeGen, Simulator compilation, an unsigned device archive, actual archive inspection, and unsigned IPA packaging. The [second successful run](https://github.com/LPnevmatikos/FlubberKeyboard/actions/runs/40744632353) also installed/launched the companion app in Simulator, captured light/dark screenshots, and published the unsigned IPA. It did not enable or exercise the real keyboard extension.
 
 `Flubber-unsigned.ipa` is a package for a signing installer. It has no provisioning profiles or developer signature. `Flubber-unsigned.xcarchive.zip` is a developer archive. Neither installs directly from Safari. Artifacts expire after seven days; rerun the workflow if needed. GitHub Actions usage is subject to your account's allowance/billing settings.
