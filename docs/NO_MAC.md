@@ -1,30 +1,36 @@
 # Getting onto an iPhone without your own Mac
 
-The project can compile on a GitHub-hosted macOS runner. Installation still requires Apple signing. A ZIP of source, an unsigned archive, or a Simulator build cannot be installed on an ordinary iPhone from Safari.
+The native app and keyboard extension now compile on GitHub's cloud Mac. [The first successful build](https://github.com/LPnevmatikos/FlubberKeyboard/actions/runs/40743841766) used Xcode 16.4 and passed all nine shared-deck tests. The device archive contains both executables and both word resources. Physical iPhone behavior remains untested.
 
-## First: compile on a cloud Mac
+## Free Apple account + Windows PC
 
-Put this project at the root of your chosen GitHub repository. The included `.github/workflows/ios-build.yml` runs on pushes to `main`, pull requests, or manually via Actions → iOS cloud build → Run workflow.
+A Windows signing installer is a possible route without your Mac. [AltStore Classic supports free accounts](https://faq.altstore.io/altstore-classic/your-altstore) and [documents Windows installation](https://faq.altstore.io/altstore-classic/how-to-install-altstore-windows). This is a third-party development installation route, not TestFlight. Flubber has not yet been installed through it, so signing and keyboard registration still need to be verified on your device.
 
-It runs the shared tests, generates the Xcode project, builds both native targets for Simulator, archives both for an iPhone without signing, and inspects the actual archive for the embedded extension and matching bundled word resources. Logs and a clearly labeled unsigned archive are saved as Actions artifacts for seven days. GitHub-hosted macOS usage is subject to your account's Actions allowance and billing settings.
+1. Follow AltStore's Windows instructions to install AltServer, the required Apple desktop components, and AltStore Classic on your connected iPhone. Use the project's official links. Unlock/trust the iPhone when prompted. Enter your Apple credentials only in the signing tool on your own computer, never into this repository or chat.
+2. Enable Developer Mode on the iPhone under Settings → Privacy & Security if requested, then complete the restart/confirmation. Trust your developer entry under Settings → General → VPN & Device Management if requested.
+3. Download `Flubber-unsigned-IPA-REQUIRES-SIGNING` from a successful [Actions run](https://github.com/LPnevmatikos/FlubberKeyboard/actions). Extract the artifact ZIP; the file inside is `Flubber-unsigned.ipa`. The first build's older archive-only artifact is not the IPA artifact.
+4. Transfer the IPA to Files on your iPhone, then open AltStore Classic → My Apps → + and select it. Let the installer sign and install the app **and its keyboard extension**. If an installer offers to remove extensions, keep them: `FlubberKeyboardExtension.appex` is the actual keyboard.
+5. Open Flubber. Then enable the real keyboard via Settings → General → Keyboard → Keyboards → Add New Keyboard → Flubber. Do not enable Full Access; it is unnecessary.
+6. Open Notes, place the cursor in a draft, and choose Flubber using the globe picker. Tap one word and use the globe to leave it. Then follow [the full acceptance checklist](IPHONE_CHECKLIST.md), including Messages and rapid taps.
 
-No Apple credentials are needed for this compile check. It does not install on your phone, launch Simulator, or exercise the keyboard. If a build fails, use its log to fix the native source and repeat before setting up signing.
+Free-account installations expire after seven days unless refreshed. AltStore documents refresh and active-app limits. [Each extension consumes an App ID](https://faq.altstore.io/altstore-classic/app-ids); Flubber needs two (app + keyboard), in addition to the installer's own usage. If installation fails, save the error message with personal details removed so we can diagnose it. This route does not establish that the keyboard works until the actual device checks pass.
 
-## Then: choose an install route
+[Sideloadly](https://sideloadly.io/) is another Windows signing installer that supports free accounts and IPA files. It can remove app extensions, so keep the keyboard extension if using it. We have not validated either installer with Flubber yet. No signing installer or third-party runtime code is added to Flubber itself.
 
-**Active paid Apple Developer Program membership:** a cloud Mac can create a signed build using your developer team's signing assets. TestFlight internal testing is a convenient route when only an iPhone is available: create the app record and identifiers, configure signing for both app and keyboard extension, archive/upload on the cloud Mac, then install the processed build in TestFlight. Add yourself as an internal tester in App Store Connect. External testers can require beta review; a public App Store release is not needed for internal testing. Apple's processing and any compliance requirements still apply.
+## Only an iPhone available
 
-Alternatively, ad hoc distribution uses a registered iPhone UDID and matching provisioning profiles for both app and extension. A signed IPA then needs a supported installation channel; downloading it from GitHub in Safari alone does not install it. We have not provisioned a signing/distribution service or an OTA host.
+An unsigned IPA cannot be installed simply by tapping it in Safari or Files. We do not have an on-device signing setup or an authenticated remote Mac/device connection. With a free account and only your iPhone, installation remains blocked until a suitable computer/signing setup is available. Access to a Windows PC may be enough for the route above; your own Mac is not the only possible computer.
 
-**No paid membership:** Apple's Personal Team route uses an Apple Account signed in to Xcode for personal-device installation. We do not have that authenticated Mac/device setup in this Linux workspace. We cannot produce a phone-installable build from only source plus this workspace. Regaining access to a Mac (or arranging appropriate remote Mac/device access) is the next practical step; paid enrollment plus cloud distribution is another option, chosen by you.
+## When your Mac is available
 
-Do not paste Apple passwords, private keys, signing certificates with private keys, or API keys into chat or commit them. Once an install route is selected, configure required credentials through that service's secrets/signing interface. Cloud build and TestFlight setup are not yet executed for this project.
+Use the Xcode instructions in `README.md`, select your Personal Team for both targets, and install directly to your iPhone. This is Apple's personal-device testing route. See [Apple's developer account guidance](https://developer.apple.com/help/account/basics/about-your-developer-account/).
 
-After installing through the selected route, follow Settings → General → Keyboard → Keyboards → Add New Keyboard → Flubber, then select it from the globe picker in Notes. Start with one insertion and keyboard switching; then complete `IPHONE_CHECKLIST.md` in Notes and Messages.
+## Paid membership option
 
-References:
+[Apple's distribution methods](https://help.apple.com/xcode/mac/current/en.lproj/dev31de635e5.html) include TestFlight/App Store Connect and ad hoc profiles for registered devices. These need an Apple Developer Program membership. A cloud Mac can handle compilation and signing once signing assets are configured; TestFlight internal testing does not require a public App Store release. Enrollment, signing setup, and Apple processing are separate steps and have not been performed.
 
-- [Apple: developer account and Personal Team](https://developer.apple.com/help/account/basics/about-your-developer-account/)
-- [Apple: distribution methods](https://help.apple.com/xcode/mac/current/en.lproj/dev31de635e5.html)
-- [Apple: TestFlight overview](https://developer.apple.com/help/app-store-connect/test-a-beta-version/testflight-overview/)
-- [GitHub: signing Xcode applications on macOS runners](https://docs.github.com/en/actions/how-tos/deploy/deploy-to-third-party-platforms/sign-xcode-applications)
+## Build artifacts and scope
+
+The cloud workflow runs Swift tests, XcodeGen, Simulator compilation, an unsigned device archive, actual archive inspection, and unsigned IPA packaging. A Simulator companion-app smoke step captures light/dark screenshots. Read the specific run's results; a new workflow step is not a passed check until that run succeeds.
+
+`Flubber-unsigned.ipa` is a package for a signing installer. It has no provisioning profiles or developer signature. `Flubber-unsigned.xcarchive.zip` is a developer archive. Neither installs directly from Safari. Artifacts expire after seven days; rerun the workflow if needed. GitHub Actions usage is subject to your account's allowance/billing settings.

@@ -2,11 +2,11 @@
 
 Native iPhone app and word-only custom keyboard, targeting iOS 17+. The SwiftUI app offers a demo and setup instructions; the UIKit extension inserts words into the host draft. Everything is local. No Full Access, network, accounts, App Groups, or third-party runtime packages.
 
-**Status:** implementation prepared on Linux. This is not yet a verified iPhone build. See [validation status](docs/VALIDATION.md) and complete the [physical iPhone checklist](docs/IPHONE_CHECKLIST.md) before treating v1 as complete.
+**Status:** both native targets compiled successfully on a cloud Mac using Xcode 16.4; all nine shared-deck tests passed. The app has not yet been signed, installed, or verified on a physical iPhone. See [validation status](docs/VALIDATION.md) and complete the [physical iPhone checklist](docs/IPHONE_CHECKLIST.md) before treating v1 as complete.
 
 ## Without your own Mac
 
-See [cloud build and iPhone installation options](docs/NO_MAC.md). The included GitHub Actions workflow compiles both native targets on macOS and checks the actual archived extension. Apple signing is still required to install on an iPhone.
+See [cloud build and iPhone installation options](docs/NO_MAC.md). The included GitHub Actions workflow compiles both native targets on macOS and checks the actual archived extension. Apple signing is still required to install on an iPhone. A Windows signing installer may work with your free Apple account; a computer-free Safari download will not install the unsigned IPA.
 
 ## Generate and build on a Mac
 

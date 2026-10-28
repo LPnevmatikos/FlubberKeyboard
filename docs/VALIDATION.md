@@ -1,28 +1,32 @@
 # Validation status
 
-Recorded 2026-10-28 in a Debian 13 Linux workspace. There was no existing Xcode skeleton or installed Swift toolchain. A temporary official Swift 6.0.3 Ubuntu 24.04 toolchain was downloaded outside the project to execute portable tests. No toolchain binaries or runtime dependencies are bundled with the deliverable.
+Updated 2026-10-28. Implementation started on Debian 13; native compilation now also runs on GitHub-hosted macOS.
 
-## Passed here
+## Passed
 
-- `swift test`: **9 XCTest tests, 0 failures**. Shared Swift source compiles and the bundled resource is found through SwiftPM. Coverage includes sanitization/deduplication, 120 curated entries and required examples, deterministic small-bag exhaustion/refill, full-deck exhaustion, 30 synchronous insertions in exact order with one trailing space, 10,000 replacement iterations across two deck sizes with unchanged other slots and distinct words, missing/invalid/unreadable-as-UTF8 resource fallback, and invalid slot handling.
-- `python3 scripts/validate_project.py`: 120 unique lowercase ASCII word entries, extension point/principal class/open-access attributes, and expected source/resource/embedding declarations pass. The script uses Python's standard library.
-- Swift frontend syntax parsing of SwiftUI app and UIKit keyboard source passes. This does **not** resolve Apple SDK types or compile the native targets.
-- Project YAML was parsed locally and inspected for both target definitions, shared resource membership, embedding, and extension-safe API settings. This does not establish that XcodeGen generation or Xcode builds succeed.
+[Cloud build 40743841766](https://github.com/LPnevmatikos/FlubberKeyboard/actions/runs/40743841766), commit `d4bc24c59516871df8fa5b0c6097e0d5a279923b`:
 
-## Pending — requires Mac/Xcode
+- Xcode 16.4 (16F6), Apple Swift 6.1.2. XcodeGen generated the actual project.
+- Nine shared-deck XCTest tests passed with zero failures on macOS. The same suite previously passed on Linux Swift 6.0.3.
+- Both native targets compiled/linked for iOS Simulator.
+- Both native targets compiled/linked into a Release iPhone archive without signing. Xcode validated the embedded extension.
+- The actual archive passed inspection: app and keyboard executables, resolved principal class, correct extension point, no requested Full Access or full ASCII capability, matching identifier prefixes, and both bundled 120-word resources.
+- Portable resource and project-declaration checks passed.
 
-- XcodeGen generation, generated-project inspection, and SDK type checking/linking of both iOS targets.
-- Simulator build/launch, installed extension discovery, actual extension embedding and resource lookup at runtime, and principal-class loading.
-- Real `textDocumentProxy` insertion/deletion, event delivery for rapid taps, system globe picker, and switching among enabled keyboards.
-- Layout/constraint behavior in narrow portrait and landscape, safe-area insets, light/dark appearance, full rendering of long words, Dynamic Type, VoiceOver, and target-size measurements.
-- Developer-team signing, physical iPhone installation, Notes and Messages checks, no-Full-Access operation, airplane mode, lifecycle restarts, and restricted fields/apps.
+An unsigned IPA was packaged locally from that exact cloud-built archive. ZIP contents were checked for the embedded keyboard, both 120-word resources, executable permissions, and absence of bundled provisioning profiles. It still needs a signing installer before any iPhone can install it.
 
-The pure-logic 30-tap test establishes returned insertion strings, not delivery of 30 real touches to a host draft. Static embedding declarations do not establish a working embedded extension. The [iPhone checklist](IPHONE_CHECKLIST.md) is the acceptance gate, and every box remains unchecked until someone performs it. Version 1 is **not device-validated or complete** until those checks pass. App Store release is a separate decision and readiness pass.
+The deck suite covers sanitization/deduplication; required examples and 120 curated entries; deterministic small-bag and full-deck exhaustion/refill; 30 synchronous insertion strings in exact order; 10,000 replacement iterations across two deck sizes with stable other slots and distinct words; missing/invalid/invalid-UTF8 resource fallback; and invalid slots. The 30-tap test checks returned strings, not actual touches delivered to a host draft.
 
-## Cloud-build preparation (2026-10-28)
+## Pending
 
-Added a GitHub Actions macOS workflow for portable tests, XcodeGen generation, Simulator compilation, unsigned iPhone archive, and real archive inspection. Workflow YAML parses and supporting Python scripts pass syntax checks locally. No cloud build has run yet.
+- The newly added cloud Simulator companion install/launch/screenshots step must complete before it can be reported as passed. It does not enable or test the real keyboard extension.
+- Real extension loading, `textDocumentProxy` insertion/deletion, rapid touches, globe switching and picker behavior.
+- Keyboard layout and constraints in narrow portrait/landscape, long words, light/dark mode, Dynamic Type, VoiceOver, and measured touch targets.
+- Signing and physical iPhone installation. User reports a free Apple developer account; paid TestFlight/ad hoc signing is unavailable under that account. Windows free-account signing is a candidate installation route, not yet verified with this app.
+- Notes and Messages, no-Full-Access operation, airplane mode, lifecycle restarts, restricted fields/apps.
 
-Attempting to create a private `LPnevmatikos/FlubberKeyboard` repository returned GitHub's `Resource not accessible by integration (createRepository)`. The connected integration can access repositories but cannot create this one. The user must create a repository or identify an existing authorized destination before we can push and run the macOS build. No repository was created and no code was uploaded in that attempt.
+The [iPhone checklist](IPHONE_CHECKLIST.md) remains the acceptance gate. Its boxes stay unchecked until performed; compiling on a cloud Mac does not complete device validation. App Store release remains a separate decision/readiness pass.
 
-Apple signing credentials, paid membership status, and an iPhone installation route have not yet been established. None of the previously pending native/device checks can be marked passed from these preparations.
+## Known build warnings
+
+The first build reported UIKit deprecations for `traitCollectionDidChange` and legacy button `contentEdgeInsets`, an app orientation warning, and Xcode's skipped AppIntents metadata extraction (no AppIntents dependency is used). These did not fail compilation. No physical-device behavior is inferred from the build result.

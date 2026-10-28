@@ -41,6 +41,16 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build/Simulator CODE_SIGNING_ALLOWED=NO build \
             2>&1 | tee build/simulator-build.log
+      - name: Launch companion app on Simulator
+        run: python3 scripts/simulator_smoke.py build/Simulator/Build/Products/Debug-iphonesimulator/Flubber.app build/simulator-smoke
+      - name: Upload companion screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: companion-simulator-smoke
+          path: build/simulator-smoke
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Build unsigned iPhone archive
         run: |
           set -o pipefail
@@ -50,7 +60,7 @@ jobs:
             -derivedDataPath build/Device \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO archive \
             2>&1 | tee build/device-build.log
-          python3 scripts/verify_archive.py build/Flubber-unsigned.xcarchive
+          python3 scripts/package_unsigned_ipa.py build/Flubber-unsigned.xcarchive build/Flubber-unsigned.ipa
           ditto -c -k --keepParent build/Flubber-unsigned.xcarchive build/Flubber-unsigned.xcarchive.zip
       - name: Upload compilation logs
         if: always()
@@ -65,5 +75,12 @@ jobs:
         with:
           name: Flubber-unsigned-archive-NOT-INSTALLABLE
           path: build/Flubber-unsigned.xcarchive.zip
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload IPA for a separate signing installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Flubber-unsigned-IPA-REQUIRES-SIGNING
+          path: build/Flubber-unsigned.ipa
           if-no-files-found: error
           retention-days: 7
