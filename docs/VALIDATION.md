@@ -27,7 +27,7 @@ The deck suite covers sanitization/deduplication; required examples and 120 cura
 
 - Real extension loading, `textDocumentProxy` insertion/deletion, rapid touches, globe switching and picker behavior.
 - Keyboard layout and constraints in narrow portrait/landscape, long words, light/dark mode, Dynamic Type, VoiceOver, and measured touch targets.
-- Signing and physical iPhone installation. User reports a free Apple developer account; paid TestFlight/ad hoc signing is unavailable under that account. Windows free-account signing is a candidate installation route, not yet verified with this app.
+- Signing and physical iPhone installation. User reports a free Apple developer account; paid TestFlight/ad hoc signing is unavailable under that account. The user has an Ubuntu ThinkPad; direct IPA signing/import through iloader is the current candidate installation route, not yet verified with this app.
 - Notes and Messages, no-Full-Access operation, airplane mode, lifecycle restarts, restricted fields/apps.
 
 The [iPhone checklist](IPHONE_CHECKLIST.md) remains the acceptance gate. Its boxes stay unchecked until performed; compiling on a cloud Mac does not complete device validation. App Store release remains a separate decision/readiness pass.

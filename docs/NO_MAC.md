@@ -2,6 +2,29 @@
 
 The native app and keyboard extension now compile on GitHub's cloud Mac. [The first successful build](https://github.com/LPnevmatikos/FlubberKeyboard/actions/runs/40743841766) used Xcode 16.4 and passed all nine shared-deck tests. The device archive contains both executables and both word resources. Physical iPhone behavior remains untested.
 
+## Free Apple account + Ubuntu ThinkPad (current installation route)
+
+Use [iloader's official desktop installer](https://iloader.app/) to sign/import the compiled Flubber IPA directly. Its official site supports Linux and custom IPA import; [SideStore's Linux prerequisites](https://docs.sidestore.io/docs/installation/prerequisites) also document the Ubuntu DEB and usbmuxd requirement. This route still needs real-device verification with Flubber.
+
+On the ThinkPad:
+
+1. Download **Ubuntu/Debian (.deb)** from the official iloader site. For a typical Intel/AMD ThinkPad this is `iloader-linux-amd64.deb`; `uname -m` should show `x86_64`. ARM (`aarch64`) requires the corresponding ARM release instead.
+2. Open Terminal and run:
+
+   ```sh
+   cd ~/Downloads
+   sudo apt update
+   sudo apt install usbmuxd ./iloader-linux-amd64.deb
+   ```
+
+3. Download `Flubber-unsigned.ipa` from the ChatGPT attachment, or extract it from the `Flubber-unsigned-IPA-REQUIRES-SIGNING` artifact in [the successful cloud build](https://github.com/LPnevmatikos/FlubberKeyboard/actions/runs/40744632353).
+4. Connect the unlocked iPhone with a USB data cable and accept **Trust This Computer** on the phone. Launch iloader from Ubuntu's application launcher and sign into your Apple account locally, including 2FA if prompted.
+5. Choose the phone and **Import IPA**, select `Flubber-unsigned.ipa`, and let iloader sign/install it. Preserve `FlubberKeyboardExtension.appex` if offered an extension-removal choice. Flubber's native keyboard must be installed as an actual app extension.
+6. On iPhone, trust your developer entry under Settings → General → VPN & Device Management if prompted. Enable Developer Mode under Settings → Privacy & Security if requested, completing the restart/confirmation.
+7. Open Flubber. Then Settings → General → Keyboard → Keyboards → Add New Keyboard → Flubber. Choose it with the globe picker in a Notes draft. First verify one word insertion and the ability to switch away, then follow `IPHONE_CHECKLIST.md`.
+
+Free-account signing expires after seven days. For this direct-install route, plan to reconnect to the ThinkPad and re-sign/reinstall using the same account and IPA before expiry. Apple account/app-ID limits and signing-tool errors can still block installation; send the exact error with personal details removed if that happens. Do not send passwords, 2FA codes, pairing files, or signing keys to chat. If Ubuntu cannot install the DEB, send the dependency error before attempting other package changes.
+
 ## Free Apple account + Windows PC
 
 A Windows signing installer is a possible route without your Mac. [AltStore Classic supports free accounts](https://faq.altstore.io/altstore-classic/your-altstore) and [documents Windows installation](https://faq.altstore.io/altstore-classic/how-to-install-altstore-windows). This is a third-party development installation route, not TestFlight. Flubber has not yet been installed through it, so signing and keyboard registration still need to be verified on your device.
