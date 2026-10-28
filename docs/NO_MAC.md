@@ -2,7 +2,23 @@
 
 The native app and keyboard extension now compile on GitHub's cloud Mac. [The first successful build](https://github.com/LPnevmatikos/FlubberKeyboard/actions/runs/40743841766) used Xcode 16.4 and passed all nine shared-deck tests. The device archive contains both executables and both word resources. Physical iPhone behavior remains untested.
 
-## Free Apple account + Ubuntu ThinkPad (current installation route)
+## iPhone-only over-the-air option: paid hosted signing
+
+A computer is not universally required. [Signulous](https://www.signulous.com/) advertises custom IPA uploads and device-side installation. Its [registration page](https://www.signulous.com/register) currently lists **$19.99 per iOS device for one year**, with an automatic-renewal option. This is a separate third-party signing service; your own free Apple account does not need to become a paid Apple Developer membership to use the service's device registration/signing route.
+
+On the iPhone:
+
+1. Save `Flubber-unsigned.ipa` from the ChatGPT attachment to Files.
+2. Open Signulous in Safari, register/link that iPhone through its official device-registration flow, and purchase its iOS signing option if you choose this route. No purchase has been made on your behalf.
+3. Once signing access is active, open its signing dashboard, upload the IPA, and preserve the bundled `FlubberKeyboardExtension.appex` when configuring signing. The keyboard requires that extension to remain embedded, signed and provisioned; installing only the companion app is insufficient.
+4. Sign the app and follow the service's Install prompts on that iPhone. Complete any system developer-trust/Developer Mode prompts if requested.
+5. Enable Flubber under Settings → General → Keyboard → Keyboards → Add New Keyboard, then try one insertion and keyboard switching in Notes.
+
+[Signulous's install guide](https://www.signulous.com/sign-apps) confirms the sign/install flow; its homepage confirms custom IPA uploads. Public documentation does not demonstrate Flubber's specific keyboard extension working. The backend named by the service, [iOS App Signer](https://www.iosappsigner.com/), supports `.appex` processing in its [source](https://github.com/DanTheMan827/ios-app-signer/blob/master/AppSigner/MainView.swift), but that does not prove the hosted service's configuration or Flubber compatibility. Before purchasing solely for this keyboard, the useful support question is: “Can your custom IPA signing retain and provision an embedded com.apple.keyboard-service .appex? This app has no App Groups or push entitlement.”
+
+This is a candidate route, not a completed phone test. [The provider's support page](https://www.signulous.com/support) discusses certificate revocations and activation/migration delays; its registration page also notes certificates may be revoked. Do not treat advertised instant access or a year of service as a guarantee of uninterrupted app operation. The user must choose/pay for the service and perform its device-linking steps; we have neither registered their iPhone nor installed a profile.
+
+## Free Apple account + Ubuntu ThinkPad (computer alternative)
 
 Use [iloader's official desktop installer](https://iloader.app/) to sign/import the compiled Flubber IPA directly. Its official site supports Linux and custom IPA import; [SideStore's Linux prerequisites](https://docs.sidestore.io/docs/installation/prerequisites) also document the Ubuntu DEB and usbmuxd requirement. This route still needs real-device verification with Flubber.
 
@@ -42,7 +58,7 @@ Free-account installations expire after seven days unless refreshed. AltStore do
 
 ## Only an iPhone available
 
-An unsigned IPA cannot be installed simply by tapping it in Safari or Files. We do not have an on-device signing setup or an authenticated remote Mac/device connection. With a free account and only your iPhone, installation remains blocked until a suitable computer/signing setup is available. Access to a Windows PC may be enough for the route above; your own Mac is not the only possible computer.
+An unsigned IPA cannot be installed simply by tapping it in Safari or Files. We do not have an on-device signing setup or an authenticated remote Mac/device connection. With only a free account and no existing on-device/hosted signing setup, we have not verified a free first-install route. The paid hosted-signing option above is a phone-only alternative; the limitation is not a universal ban on OTA installation. Access to a Windows PC may be enough for the route above; your own Mac is not the only possible computer.
 
 ## When your Mac is available
 
