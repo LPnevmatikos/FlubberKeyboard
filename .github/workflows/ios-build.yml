@@ -1,0 +1,69 @@
+name: iOS cloud build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Record Apple toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+      - name: Install project generator
+        run: command -v xcodegen >/dev/null || brew install xcodegen
+      - name: Test shared deck and validate declarations
+        run: |
+          swift test
+          python3 scripts/validate_project.py
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Build containing app and embedded extension for Simulator
+        run: |
+          set -o pipefail
+          mkdir -p build
+          xcodebuild -project FlubberKeyboard.xcodeproj -scheme Flubber \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/Simulator CODE_SIGNING_ALLOWED=NO build \
+            2>&1 | tee build/simulator-build.log
+      - name: Build unsigned iPhone archive
+        run: |
+          set -o pipefail
+          xcodebuild -project FlubberKeyboard.xcodeproj -scheme Flubber \
+            -configuration Release -destination 'generic/platform=iOS' \
+            -archivePath build/Flubber-unsigned.xcarchive \
+            -derivedDataPath build/Device \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO archive \
+            2>&1 | tee build/device-build.log
+          python3 scripts/verify_archive.py build/Flubber-unsigned.xcarchive
+          ditto -c -k --keepParent build/Flubber-unsigned.xcarchive build/Flubber-unsigned.xcarchive.zip
+      - name: Upload compilation logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: build/*.log
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Upload unsigned archive (not installable)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Flubber-unsigned-archive-NOT-INSTALLABLE
+          path: build/Flubber-unsigned.xcarchive.zip
+          if-no-files-found: error
+          retention-days: 7
